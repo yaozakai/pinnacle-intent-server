@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 var express = require('express');
 
 var passport = require('passport');
@@ -7,13 +7,25 @@ var passport = require('passport');
 import UserModel from '../api/components/userModel';
 import { emailService } from '../api/components/email';
 import * as AuthCheck from '../api/components/authCheck';
-var GoogleStrategy = require('passport-google-oidc');
-
-
+// var GoogleStrategy = require('passport-google-oidc');
+import {initializePassportConfig} from '../../passport-config';
 
 const authRoute: Router = Router();
 
-authRoute.get('/auth/google', AuthCheck.verify, passport.authenticate('google'));
+// Initialize Passport configuration middleware
+const initializePassportMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    // Get the hostname
+    const hostname = req.hostname;
+    // Call the initialization function
+    initializePassportConfig(passport, hostname);
+    // Call next middleware
+    next();
+};
+
+
+authRoute.get('/auth/google', initializePassportMiddleware, AuthCheck.verify, passport.authenticate('google', {
+    scope: ['profile']
+}));
 
 
 // authRoute.get('/auth/google', AuthCheck.verify, passport.authenticate('google'), async (req: Request, res: Response) => {
@@ -22,7 +34,7 @@ authRoute.get('/auth/google', AuthCheck.verify, passport.authenticate('google'))
 
 authRoute.get('/auth/facebook', AuthCheck.verify, passport.authenticate('facebook'));
 
-authRoute.get('/google/redirect', AuthCheck.verify, passport.authenticate('google'), async (req: Request, resp: Response) => {
+authRoute.get('/auth/google/callback', AuthCheck.verify, passport.authenticate('google'), async (req: Request, resp: Response) => {
     try {
         if (req.isAuthenticated()) {
             const user = req.user as UserModel;

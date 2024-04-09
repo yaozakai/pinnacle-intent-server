@@ -4,10 +4,15 @@ import authRoute from './src/routes/auth';
 import passport from 'passport';
 import {initializePassportConfig} from './passport-config';
 import session from 'express-session';
+import http from 'http'
+import https from 'https'
+import fs from 'fs'
 
 dotenv.config();
 
-initializePassportConfig(passport)
+var privateKey  = fs.readFileSync(__dirname + '/ssl/server.key');
+var certificate = fs.readFileSync(__dirname + '/ssl/server.crt');
+var credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,7 +42,24 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     // res.status(500).send(res,);
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+app.get('/', (req, res) => {
+    res.send('Now using https..');
+ });
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+httpsServer.listen(8443, () => {
+        console.log(`Server is running on port 8443`);
+    });
+
+// http.createServer(app).listen(port)
+// https.createServer(credentials, app).listen(443)
+
+// // Start the server
+// app.listen(port, () => {
+//     console.log(`Server is running on port ${port}`);
+// });

@@ -1,3 +1,5 @@
+import os from 'os';
+
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
@@ -7,7 +9,10 @@ import crypto from 'crypto';
 import { sql } from '@vercel/postgres';
 import { Request } from 'express';
 
-export function initializePassportConfig(passport: any) {
+export function initializePassportConfig(passport: any, hostname: string) {
+
+    const googleCallbackURL = `http://${hostname}:${process.env.PORT}/auth/google/callback`; 
+
     const authenticateEMailUser = async (email: string, password: string, done: any) => {
         try {
             // Retrieve user by email
@@ -84,9 +89,9 @@ export function initializePassportConfig(passport: any) {
     passport.use(
         new GoogleStrategy(
             {
-                callbackURL: '/auth/google/redirect',
+                callbackURL: googleCallbackURL,
                 clientID: process.env.GOOGLE_ID as string,
-                clientSecret: process.env['GOOGLE_SECRET'] as string
+                clientSecret: process.env.GOOGLE_SECRET as string
             },
             authenticateGoogleUser
         )
@@ -95,7 +100,7 @@ export function initializePassportConfig(passport: any) {
     // passport.use(
     //     new FacebookStrategy(
     //         {
-    //             callbackURL: '/auth/facebook/redirect',
+    //             callbackURL: '/auth/facebook/callback',
     //             clientID: process.env['FACEBOOK_ID'],
     //             clientSecret: process.env['FACEBOOK_SECRET']
     //         },
