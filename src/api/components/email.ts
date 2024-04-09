@@ -1,7 +1,8 @@
 import { Request as ExpressRequest, Response } from 'express';
 import crypto from 'crypto';
 import sgMail from '@sendgrid/mail';
-import UserModel from './user-model';
+// const sgMail = require('@sendgrid/mail');
+import UserModel from './userModel';
 
 // Check if SENDGRID_KEY is defined
 if (!process.env.SENDGRID_KEY) {

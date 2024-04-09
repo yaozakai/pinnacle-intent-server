@@ -63,6 +63,19 @@ class UserModel {
     }
   }
 
+  static async getUserById(id: string): Promise<UserSchema | null> {
+    try {
+        const result = await sql`
+            SELECT * FROM users WHERE id = ${id};
+        `;
+        return result.rows.length > 0 ? result.rows[0] as UserSchema : null;
+    } catch (error) {
+        console.error('Error fetching user by ID:', error);
+        return null;
+    }
+}
+
+
   static async getUserByEmail(email: string): Promise<UserSchema | null> {
     try {
       const result = await sql`

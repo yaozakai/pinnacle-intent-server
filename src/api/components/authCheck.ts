@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import UserModel from './user-model';
+import UserModel from './userModel';
+import { UserSchema } from './userModel'; // Import UserSchema interface
 
 export const verifyEmail = async function (req: Request, res: Response, next: NextFunction) {
     try {
@@ -62,41 +63,3 @@ export const login = async function (req: Request, res: Response, next: NextFunc
         return res.redirect('/dashboard');
     }
 };
-
-// export const dash = function (req: Request, res: Response, next: NextFunction) {
-//     if (req.isAuthenticated()) {
-//         if (UserModel.isVerified || req.user.googleId) {
-//             // logged in and verified, proceed
-//             next();
-//             return;
-//         } else {
-//             // not verified, return to home, request resending of verify email
-//             req.flash('resendEmail', req.user.email);
-//             req.flash('error', 'You need to verify your account before trying the dashboard!');
-//             res.redirect('/');
-//             return;
-//         }
-//     } else {
-//         // not logged in
-//         res.redirect('/');
-//         return;
-//     }
-// };
-
-// export const home = function (req: Request, res: Response, next: NextFunction) {
-//     if (req.isAuthenticated()) {
-//         if (req.user.isVerified) {
-//             // logged in and verified, proceed
-//             res.redirect('/dashboard');
-//             return;
-//         } else {
-//             // not logged in
-//             next();
-//             return;
-//         }
-//     } else {
-//         // not logged in
-//         next();
-//         return;
-//     }
-// };
